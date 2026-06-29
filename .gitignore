@@ -1,0 +1,22 @@
+# 1. Dependencies (Heavy folders downloaded by npm install)
+node_modules/
+dist/
+build/
+.cache/
+
+# 2. Local Secret Environment Files (CRITICAL: Keeps keys off GitHub)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/firebase-key.json
+firebase-key.json/
+
+# 3. System Logs & Editor Settings
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.vscode/
+.idea/

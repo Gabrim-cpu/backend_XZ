@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "xz-bridging-generational-gap",
+  "private_key_id": "1dbc7ebc29390b6601a67f814ff89793f9249c05",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCuWudnzlPivPVe\nCjEGhsXEnmyyY3NgK1E+khGeATGqFVgYG1d8DKQP6wFXrF8M75a2NGGscZN4HG23\nJba6khH4ojpn72k3s0E/R0N5Di4+yufU8296J3ueFaN1vFL0Z5YF8H2VShqapH0c\n8sw+McFI3Nqc5rwfu7kdcrm0r9JaVRrCf956sYi/J3oq+6hU2w6K+yLQ+Bz1lU0t\nI0bsNfvRoeqHowKr6wgINwLesvE9oiyug0L1S8R/Xew4TqiJT/iG4HiVxRRKZXXw\nqjv0MAusEJ04L0dAFwVYb0bDfZZ2GvJBBuOqEbaFs1XblY/8ZRv04DbcgodmVN7M\nNzk+v0i3AgMBAAECggEACRJty/buYnPWiIgbOO22SJ69pSKLlEtstMbA5+nD/ceS\nh96UVL4Lo1BlB3zOjUvCGcTr+B8Iv00rYEY0Fc0X5kn6pAHPBbjsAjDhD+FvApFo\nMqpf+IkpY3ZYxP2Bi3oAUlrLDgOHEtjQMbtoaSwJlJL5RQS0cSpBXYjkpMQpO83v\nxf/E/nfAx/fFr3ERbv5HWVzbfEf0WvdsIl2pY/MNcy8OIRQl5+hcnbamGtXSrnjO\n087BonkWRe3y9tAeHiwOTUeC16ANcmAee0DLfTu8WX8+oqDm+3a40E2Ujzm1jNsQ\nFlBCO1TfaGpeAVrXC9Y7MN5vn3nxf6vTQi9VJPc7oQKBgQDiyz/ZbRJd9rac2Pva\n+9ACQDmkX4mr1oowiithMjHGFJPH/SLNQ32DXAMaGr7o+LS5WRgCT/+qiiPlHD2r\nJzLSxz374TS2tqSaoWsT490AXMGhzEg47mbWDUd2lIawQcdF7fIIt67qEcRnqOQ+\n6hdxI/PUxTzDKHjNvndA8IebGQKBgQDEzuUbQdESeux2FBUOqDEo2MdvpKxnl8cp\ntxpzCzZna1ZoMvHLs1S0aeSlPPoTDsNP2lR4278OxVAusO48bE+Ppt/jUgAk8JOZ\nJFvtzgSMflW6kVLj80Sor2yD/6XpdxiYQG/0DVRUPSWNX9LE7xK7jMjpYS1enw4l\nUp9wQBNMTwKBgEFxQtBbr+QbT+B8oFg1N3We0MNEqjZCpweQpynZ0REGWQppWgR/\nCBXClEaRFyuksImXUt0/9ldgmzD+cDEWE41M3u7yskJS+7Z/A6Xup5P2MA2fI+wB\npvz3QfrOqvrrUDQ2kBPB5SA31kPPMWWSKQeFx1NLQthRsmI0Jrc/cPHpAoGAcwoM\n2ZXrQ8Yemha7CEpAEgRE73luXU9W14d0KnMPZfxUEaxVsiAtDxgm0n+GHcWvXOne\nHpc0YsnrSJ+bYi5dgzakABhahT0qyYV7RtH5zrW6Hsf7j8sPAxsnbzDsJj+7XKOt\nzRZNiMAFR1IPvZWReZediO2Iu5p1hlN5Zv/NR/kCgYEApUC1vYmiOvWkmvi/id7M\ndu1VWsFikTXGC9xUB1hmb8mFx0bFTGCTbTLuvBFIfI11aj5T3LAgtU7vI5Xv+HVr\ni8SqPpt2KmtqJciCnMABRMVRGjOkgDLpDYyl9y3eP/o+00l8a2WJJ5MAoF648kkk\nUh3iPKmQdaK/7zAvj7TIjS8=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@xz-bridging-generational-gap.iam.gserviceaccount.com",
+  "client_id": "107429058698712882145",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40xz-bridging-generational-gap.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

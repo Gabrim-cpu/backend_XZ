@@ -1,0 +1,35 @@
+{
+  "name": "xz-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Digital Roots (XZ) Intergenerational Platform",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "db:up": "node -e \"import('./scripts/dockerUtils.js').then(m => { m.runDockerCompose('up -d'); })\"",
+    "db:down": "node -e \"import('./scripts/dockerUtils.js').then(m => { m.runDockerCompose('down'); })\"",
+    "db:reset": "node scripts/resetDatabase.js",
+    "db:setup": "node scripts/ensureDatabase.js && node src/utils/setupDatabase.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.10.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^8.5.2",
+    "express-validator": "^7.3.2",
+    "firebase": "^12.15.0",
+    "firebase-admin": "^14.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^7.3.0",
+    "pg": "^8.21.0",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
+  },
+  "devDependencies": {
+    "@types/socket.io": "^3.0.1",
+    "nodemon": "^3.1.0"
+  }
+}
