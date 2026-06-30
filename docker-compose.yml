@@ -14,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   mongodb:
-    image: mongo:latest
+    image: mongo:7.0
     container_name: xz_mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
