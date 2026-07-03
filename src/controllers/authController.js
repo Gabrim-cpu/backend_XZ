@@ -1,9 +1,13 @@
 import { pool } from '../config/database.js';
 
 export const handleAuth = async (req, res) => {
-  const { uid, email, name, picture } = req.firebaseUser;
-  const { identity, language, picture: uploadedPicture, age, learn_interests, share_interests } = req.body;
+  const { uid, email, name: tokenName, picture } = req.firebaseUser;
+  const { identity, language, picture: uploadedPicture, age, learn_interests, share_interests, name: bodyName } = req.body;
   const avatarUrl = uploadedPicture || picture || null;
+  // The signup form sends the chosen name in the body. The ID token is minted
+  // BEFORE updateProfile(displayName) runs client-side, so tokenName is often
+  // missing on first sync — trusting it alone stores the email prefix instead.
+  const name = bodyName || tokenName || null;
   
   try {
     let result = await pool.query(

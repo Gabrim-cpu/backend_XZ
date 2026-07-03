@@ -83,10 +83,10 @@ export const createStory = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO posts (author_id, author_name, type, body, media_url)
-       VALUES ($1, $2, 'audio_archive', $3, $4)
+      `INSERT INTO posts (author_id, author_name, type, body, media_url, category)
+       VALUES ($1, $2, 'audio_archive', $3, $4, $5)
        RETURNING *`,
-      [userId, req.user.display_name, body, media_url || null]
+      [userId, req.user.display_name, body, media_url || null, category || null]
     );
 
     // Award points for story
@@ -120,6 +120,7 @@ export const getLibrary = async (req, res) => {
       author: a.author,
       category: a.category,
       tags: a.tags || [],
+      media_url: a.media_url || null,
       created_at: a.created_at,
     })) });
   } catch (error) {
@@ -129,7 +130,7 @@ export const getLibrary = async (req, res) => {
 
 export const createLibraryArticle = async (req, res) => {
   const userId = req.user.id;
-  const { title, excerpt, content, category, tags } = req.body;
+  const { title, excerpt, content, category, tags, media_url } = req.body;
   const db = getDB();
 
   if (!db) {
@@ -147,6 +148,7 @@ export const createLibraryArticle = async (req, res) => {
       content,
       category: category || 'General',
       tags: tags || [],
+      media_url: media_url || null,
       author: req.user.display_name,
       author_id: userId,
       published: false, // Requires moderation

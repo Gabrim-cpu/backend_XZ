@@ -55,16 +55,38 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Setup Socket.io real-time connection rooms
+// Setup Socket.io real-time connection rooms + presence tracking.
+// A user may hold several sockets (multiple tabs), so we count connections
+// per user and only mark them offline when the last one drops.
+const onlineUsers = new Map(); // userId -> open socket count
+
+const broadcastPresence = () => {
+  io.emit('presence', [...onlineUsers.keys()]);
+};
+
 io.on('connection', (socket) => {
   console.log('🔌 Socket connection established:', socket.id);
-  
+
   socket.on('join', (userId) => {
+    if (!userId) return;
     socket.join(userId);
+    // Guard against the same socket joining twice
+    if (socket.data.userId !== userId) {
+      socket.data.userId = userId;
+      onlineUsers.set(userId, (onlineUsers.get(userId) || 0) + 1);
+      broadcastPresence();
+    }
     console.log(`👤 User joined WebSocket room: ${userId}`);
   });
 
   socket.on('disconnect', () => {
+    const userId = socket.data.userId;
+    if (userId) {
+      const remaining = (onlineUsers.get(userId) || 1) - 1;
+      if (remaining <= 0) onlineUsers.delete(userId);
+      else onlineUsers.set(userId, remaining);
+      broadcastPresence();
+    }
     console.log('❌ Socket disconnected:', socket.id);
   });
 });

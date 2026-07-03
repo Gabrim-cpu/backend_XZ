@@ -8,8 +8,12 @@ const normalizeUserPair = (userId1, userId2) => {
 };
 
 export const sendRequest = async (req, res) => {
-  const { receiverId } = req.body;
+  const { receiverId, message } = req.body;
   const senderId = req.user.id;
+  // Optional "why I want to connect" note, delivered inside the notification.
+  const requestBody = message?.trim()
+    ? `${req.user.display_name || 'Someone'}: "${message.trim().slice(0, 200)}"`
+    : `${req.user.display_name || 'Someone'} wants to connect with you`;
 
   if (senderId === receiverId) {
     return res.status(400).json({ error: 'Cannot connect with yourself' });
@@ -46,7 +50,7 @@ export const sendRequest = async (req, res) => {
           recipientUserId: receiverId,
           type: 'connection_request',
           title: 'New connection request',
-          body: `${req.user.display_name || 'Someone'} wants to connect with you`,
+          body: requestBody,
           data: { senderId, connectionId: reopened.rows[0].id },
           important: true,
         });

@@ -27,11 +27,10 @@ export const getFeed = async (req, res) => {
     // We will just do a simple query prioritizing connected users and the opposite identity.
     const oppositeIdentity = identity === 'Senior' ? 'Youth' : 'Senior';
 
-    // Note: userId is intentionally NOT a bound parameter here — Postgres rejects
-    // a passed parameter that's never referenced ("could not determine data type
-    // of parameter $1"). Only the two params actually used are bound.
     const postsResult = await pool.query(`
       SELECT p.*, u.identity, u.avatar_url,
+        (SELECT COUNT(*)::int FROM post_likes pl WHERE pl.post_id = p.id) AS like_count,
+        EXISTS(SELECT 1 FROM post_likes pl2 WHERE pl2.post_id = p.id AND pl2.user_id = $3::uuid) AS liked_by_me,
         CASE
           WHEN p.author_id = ANY($1::uuid[]) THEN 100
           WHEN u.identity = $2 THEN 50
@@ -41,7 +40,7 @@ export const getFeed = async (req, res) => {
       JOIN users u ON p.author_id = u.id
       ORDER BY relevance_score DESC, p.created_at DESC
       LIMIT 50
-    `, [connectedUserIds, oppositeIdentity]);
+    `, [connectedUserIds, oppositeIdentity, userId]);
 
     res.json({ feed: postsResult.rows });
   } catch (error) {
@@ -50,7 +49,7 @@ export const getFeed = async (req, res) => {
 };
 
 export const createPost = async (req, res) => {
-  const { body, media_url, type } = req.body;
+  const { body, media_url, type, category } = req.body;
   const userId = req.user.id;
   const displayName = req.user.display_name;
 
@@ -60,16 +59,47 @@ export const createPost = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO posts (author_id, author_name, type, body, media_url)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO posts (author_id, author_name, type, body, media_url, category)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [userId, displayName, type || 'post', body, media_url || null]
+      [userId, displayName, type || 'post', body, media_url || null, category || null]
     );
 
     // Award Root Points: Publish Story: +10
     await handleAction(userId, 'PUBLISH_STORY');
 
     res.status(201).json({ success: true, post: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Toggle a like on a post: unlike if already liked, like otherwise.
+export const toggleLike = async (req, res) => {
+  const userId = req.user.id;
+  const { postId } = req.params;
+
+  try {
+    const removed = await pool.query(
+      'DELETE FROM post_likes WHERE post_id = $1 AND user_id = $2',
+      [postId, userId]
+    );
+
+    let liked = false;
+    if (removed.rowCount === 0) {
+      await pool.query(
+        'INSERT INTO post_likes (post_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+        [postId, userId]
+      );
+      liked = true;
+    }
+
+    const count = await pool.query(
+      'SELECT COUNT(*)::int AS c FROM post_likes WHERE post_id = $1',
+      [postId]
+    );
+
+    res.json({ success: true, liked, like_count: count.rows[0].c });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -73,8 +73,12 @@ export const uploadBase64 = async (base64String, resourceType = 'auto') => {
 
     await fs.promises.writeFile(filePath, base64Data, 'base64');
     
+    // PUBLIC_URL must be the externally reachable origin (e.g.
+    // https://digitalroots-xz.duckdns.org) — a localhost URL stored in the DB
+    // renders as a broken image in every other browser.
     const port = process.env.PORT || 5000;
-    return `http://localhost:${port}/uploads/${filename}`;
+    const base = (process.env.PUBLIC_URL || `http://localhost:${port}`).replace(/\/$/, '');
+    return `${base}/uploads/${filename}`;
   } catch (error) {
     console.error('Local upload failed:', error);
     throw new Error('Upload failed: ' + error.message);

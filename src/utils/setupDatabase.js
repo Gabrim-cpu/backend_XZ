@@ -65,10 +65,27 @@ const setupDatabase = async () => {
         type VARCHAR(20) DEFAULT 'post',
         body TEXT,
         media_url TEXT,
+        category VARCHAR(50),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );
     `);
+
+    // Ensure new columns exist if the table was already created
+    await pool.query(`
+      ALTER TABLE posts
+      ADD COLUMN IF NOT EXISTS category VARCHAR(50);
+    `);
     console.log('✅ Posts table ready');
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS post_likes (
+        post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
+        user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        PRIMARY KEY (post_id, user_id)
+      );
+    `);
+    console.log('✅ Post likes table ready');
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS interactions (
