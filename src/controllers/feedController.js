@@ -27,6 +27,8 @@ export const getFeed = async (req, res) => {
     // We will just do a simple query prioritizing connected users and the opposite identity.
     const oppositeIdentity = identity === 'Senior' ? 'Youth' : 'Senior';
 
+    // Statuses are ephemeral and private: only your own and your accepted
+    // connections' statuses are served, and only for 24 hours after posting.
     const postsResult = await pool.query(`
       SELECT p.*, u.identity, u.avatar_url,
         (SELECT COUNT(*)::int FROM post_likes pl WHERE pl.post_id = p.id) AS like_count,
@@ -38,6 +40,11 @@ export const getFeed = async (req, res) => {
         END as relevance_score
       FROM posts p
       JOIN users u ON p.author_id = u.id
+      WHERE p.type <> 'status'
+         OR (
+           (p.author_id = $3::uuid OR p.author_id = ANY($1::uuid[]))
+           AND p.created_at > NOW() - INTERVAL '24 hours'
+         )
       ORDER BY relevance_score DESC, p.created_at DESC
       LIMIT 50
     `, [connectedUserIds, oppositeIdentity, userId]);
