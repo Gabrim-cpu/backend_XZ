@@ -10,7 +10,13 @@
     "db:up": "node -e \"import('./scripts/dockerUtils.js').then(m => { m.runDockerCompose('up -d'); })\"",
     "db:down": "node -e \"import('./scripts/dockerUtils.js').then(m => { m.runDockerCompose('down'); })\"",
     "db:reset": "node scripts/resetDatabase.js",
-    "db:setup": "node scripts/ensureDatabase.js && node src/utils/setupDatabase.js"
+    "db:setup": "node scripts/ensureDatabase.js && node src/utils/setupDatabase.js",
+    "setup-db": "node scripts/ensureDatabase.js && node src/utils/setupDatabase.js",
+    "prod:start": "NODE_ENV=production docker-compose -f docker-compose.prod.yml up -d && node src/index.js",
+    "prod:stop": "docker-compose -f docker-compose.prod.yml down",
+    "prod:logs": "docker-compose -f docker-compose.prod.yml logs -f",
+    "backup:postgres": "docker exec xz_postgres pg_dump -U xz_user xz_database > backup_$(date +%Y%m%d_%H%M%S).sql",
+    "backup:mongo": "docker exec xz_mongodb mongodump --username admin --password password123 --authenticationDatabase admin --out ./backup_$(date +%Y%m%d_%H%M%S)"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

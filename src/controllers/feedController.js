@@ -5,6 +5,14 @@ export const getFeed = async (req, res) => {
   const userId = req.user.id;
   const identity = req.user.identity;
 
+  // Check if user profile is complete
+  if (!identity) {
+    return res.status(400).json({
+      error: 'Please complete your profile before viewing the feed',
+      code: 'PROFILE_INCOMPLETE'
+    });
+  }
+
   try {
     // 1. Get all connections (accepted) to prioritize their posts
     const connectionsResult = await pool.query(`
@@ -18,13 +26,6 @@ export const getFeed = async (req, res) => {
     );
 
     // 2. Build the feed query
-    // Basic idea: Give a score to posts to rank them.
-    // Connected users: +50 score
-    // Identity-based priority:
-    // If Youth, Senior posts get +20
-    // If Senior, Youth posts get +20 (especially tech tutorials, but we don't have tags yet, so we just boost youth posts)
-    
-    // We will just do a simple query prioritizing connected users and the opposite identity.
     const oppositeIdentity = identity === 'Senior' ? 'Youth' : 'Senior';
 
     // Statuses are ephemeral and private: only your own and your accepted

@@ -216,9 +216,20 @@ export const sendMessage = async (req, res) => {
     // a refresh. We emit only to the receiver's room — the sender already shows
     // it optimistically, so emitting back would duplicate it.
     try {
-      req.io?.to(receiverId).emit('message', messagePayload);
+      console.log('📤 Emitting message to room:', receiverId);
+      console.log('📨 Message payload:', messagePayload);
+
+      if (!req.io) {
+        console.error('❌ Socket.io not available on request object');
+      } else {
+        const roomClients = req.io.sockets.adapter.rooms.get(receiverId);
+        console.log(`📊 Clients in room ${receiverId}:`, roomClients?.size || 0);
+
+        req.io.to(receiverId).emit('message', messagePayload);
+        console.log('✅ Message emitted successfully to room:', receiverId);
+      }
     } catch (e) {
-      console.error('Socket emit failed:', e.message);
+      console.error('❌ Socket emit failed:', e.message, e.stack);
     }
 
     res.status(201).json({ success: true, message: messagePayload, pointsAwarded });

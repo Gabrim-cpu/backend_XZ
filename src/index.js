@@ -18,14 +18,26 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN?.split(',') || [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://frontend-xz-git-master-gabrim-cpus-projects.vercel.app',
+    'https://www.frontend-xz-git-master-gabrim-cpus-projects.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
+};
+
 const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-  }
+  cors: corsOptions
 });
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' })); // Support larger base64 payloads for voice/images
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -66,28 +78,43 @@ const broadcastPresence = () => {
 
 io.on('connection', (socket) => {
   console.log('🔌 Socket connection established:', socket.id);
+  console.log('📊 Total active sockets:', io.engine.clientsCount);
 
   socket.on('join', (userId) => {
-    if (!userId) return;
+    if (!userId) {
+      console.error('❌ Join event received without userId');
+      return;
+    }
     socket.join(userId);
+    console.log(`✅ Socket ${socket.id} joined room: ${userId}`);
+
     // Guard against the same socket joining twice
     if (socket.data.userId !== userId) {
       socket.data.userId = userId;
       onlineUsers.set(userId, (onlineUsers.get(userId) || 0) + 1);
       broadcastPresence();
+      console.log(`👤 User ${userId} is now online (${onlineUsers.get(userId)} socket(s))`);
     }
-    console.log(`👤 User joined WebSocket room: ${userId}`);
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', (reason) => {
     const userId = socket.data.userId;
     if (userId) {
       const remaining = (onlineUsers.get(userId) || 1) - 1;
-      if (remaining <= 0) onlineUsers.delete(userId);
-      else onlineUsers.set(userId, remaining);
+      if (remaining <= 0) {
+        onlineUsers.delete(userId);
+        console.log(`❌ User ${userId} is now OFFLINE`);
+      } else {
+        onlineUsers.set(userId, remaining);
+        console.log(`👤 User ${userId} disconnected (${remaining} socket(s) remaining)`);
+      }
       broadcastPresence();
     }
-    console.log('❌ Socket disconnected:', socket.id);
+    console.log('❌ Socket disconnected:', socket.id, '- Reason:', reason);
+  });
+
+  socket.on('error', (error) => {
+    console.error('❌ Socket error:', socket.id, error);
   });
 });
 

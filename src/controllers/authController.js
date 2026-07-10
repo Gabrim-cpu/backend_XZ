@@ -3,12 +3,17 @@ import { pool } from '../config/database.js';
 export const handleAuth = async (req, res) => {
   const { uid, email, name: tokenName, picture } = req.firebaseUser;
   const { identity, language, picture: uploadedPicture, age, learn_interests, share_interests, name: bodyName } = req.body;
+
+  console.log('🔐 handleAuth called with:', { uid, email, identity, age });
+
+  if (!uid || !email) {
+    console.error('❌ Missing Firebase user data:', { uid, email });
+    return res.status(400).json({ error: 'Firebase user data missing' });
+  }
+
   const avatarUrl = uploadedPicture || picture || null;
-  // The signup form sends the chosen name in the body. The ID token is minted
-  // BEFORE updateProfile(displayName) runs client-side, so tokenName is often
-  // missing on first sync — trusting it alone stores the email prefix instead.
   const name = bodyName || tokenName || null;
-  
+
   try {
     let result = await pool.query(
       'SELECT * FROM users WHERE firebase_uid = $1',
@@ -128,13 +133,36 @@ export const handleAuth = async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Auth error:', error);
-    res.status(500).json({ error: 'Database error' });
+    console.error('❌ Auth error:', error.message);
+    console.error('Stack:', error.stack);
+    console.error('Full error:', error);
+    res.status(500).json({
+      error: 'Authentication failed',
+      message: error.message,
+      code: 'AUTH_ERROR'
+    });
   }
 };
 
 
 export const getProfile = async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM users WHERE firebase_uid = $1',
+      [req.firebaseUser.uid]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json({ user: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getPublicProfile = async (req, res) => {
   try {
     const result = await pool.query(
       'SELECT * FROM users WHERE firebase_uid = $1',

@@ -22,11 +22,13 @@ export const verifyFirebaseToken = async (req, res, next) => {
   const token = authHeader.split(' ')[1];
   
   try {
+    console.log('🔑 Verifying Firebase token...');
     const decodedToken = await firebaseAuth.verifyIdToken(token);
+    console.log('✅ Token verified for user:', decodedToken.email);
     req.firebaseUser = decodedToken;
     next();
   } catch (error) {
-    console.error('Token verification failed:', error.message);
+    console.error('❌ Token verification failed:', error.message, error.code);
     
     if (error.code === 'auth/id-token-expired') {
       return res.status(401).json({ 
